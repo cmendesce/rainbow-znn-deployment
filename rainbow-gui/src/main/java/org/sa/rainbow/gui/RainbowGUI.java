@@ -29,6 +29,7 @@ package org.sa.rainbow.gui;
 import org.apache.commons.lang.NotImplementedException;
 import org.sa.rainbow.core.*;
 import org.sa.rainbow.core.error.RainbowConnectionException;
+import org.sa.rainbow.core.error.RainbowException;
 import org.sa.rainbow.core.gauges.OperationRepresentation;
 import org.sa.rainbow.core.globals.ExitState;
 import org.sa.rainbow.core.models.ModelReference;
@@ -79,34 +80,6 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
     public static final int   MAX_TEXT_LENGTH  = 100000;
     /** Convenience constant: size of text field to set to when Max is exceeded. */
     public static final int   TEXT_HALF_LENGTH = 50000;
-
-    public static void main (String[] args) {
-        boolean showHelp = false;
-
-        int lastIdx = args.length - 1;
-        for (int i = 0; i <= lastIdx; i++) {
-            if (args[i].equals ("-h")) {
-                showHelp = true;
-            } else {
-                System.err.println ("Unrecognized or incomplete argument " + args[i]);
-                showHelp = true;
-            }
-        }
-        if (showHelp) {
-            System.out.println ("Usage:\n" + "  system property options {default}:\n"
-                                        + "    rainbow.target    name of target configuration {default}\n"
-                                        + "    rainbow.config    top config directory (org.sa.rainbow.config)\n" + " " +
-                                        " options: \n"
-                                        + "    -h          Show this help message\n" + "    -nogui      Don't show " +
-                                        "the Rainbow GUI\n" + "\n"
-                                        + "Option defaults are defined in <rainbow.target>/rainbow.properties");
-            System.exit (RainbowConstants.EXIT_VALUE_ABORT);
-        }
-
-        RainbowGUI gui = new RainbowGUI (null);
-        gui.display ();
-    }
-
 
     private JFrame m_frame = null;
 
