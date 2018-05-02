@@ -1,4 +1,8 @@
-# Rainbow components 
+# Rainbow specific deployment for ZNN web site
+
+https://travis-ci.org/cmendesce/rainbow-znn-deployment.svg?branch=master
+
+## Rainbow components 
 This directory contains components that make up most of the core of the Rainbow framework, as well as the more commonly used components such
 as using Acme for the architecture model and Stitch for expressing, deciding, and executing adaptations. There are four main components:
 
