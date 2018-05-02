@@ -10,9 +10,6 @@
     <modules>
         <module>rainbow-core</module>
         <module>rainbow-znn</module>
-        <!--<module>rainbow-acme-model</module>
-        <module>rainbow-stitch</module>
-        <module>rainbow-utility-model</module>-->
         <module>rainbow-gui</module>
     </modules>
 
