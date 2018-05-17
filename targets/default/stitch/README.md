@@ -1,7 +1,25 @@
 Extension:  Stitch scripts must have the extension ".s"; otherwise, the
 Adaptation Manager will not know to load it.
 
+# DoS Self-Protection approach using Rainbow
+
+To improve a system’s security, it is first necessary to develop a repertoire of countermeasures that can be applied in to the system.
+
 ## Tatics
+
+Tactics in Rainbow are specified through the Stitch adaptation
+language. Tactics require three parts to be specified: (1) the
+condition, which specifies when a tactic is applicable; (2) the action,
+which defines the script for making changes (to the model of
+) the system; and (3) the effect, which specifies the expected effect
+that the tactic will have on the model. In keeping with closed-loop
+control conventions, when a tactic is executed in Rainbow, changes
+are not made directly to the model. Rainbow translates these operations
+into effectors that execute on the system. Gauges then update
+the model according to the changes they observe.
+
+These tatics are defined to 
+
 #### Adding Capacity
 
 This tactic commissions a new replicated web
