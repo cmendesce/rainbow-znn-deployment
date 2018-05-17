@@ -57,3 +57,7 @@ However, re-authentication is more strict than Captcha because
 it requires that the requester be registered with the system.
 After re-authentication is deployed, anonymous users will be cut
 off from the system.
+
+
+Source: [Architecture-Based Self-Protection: Composing and
+Reasoning about Denial-of-Service Mitigations](http://www.cs.cmu.edu/~jcmoreno/files/hotsos14.pdf)
