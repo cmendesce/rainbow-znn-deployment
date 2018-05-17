@@ -77,5 +77,33 @@ After re-authentication is deployed, anonymous users will be cut
 off from the system.
 
 
+## Strategy
+
+A strategy encapsulates a dynamic adaptation process in which
+each step is the conditional execution of some tactic. In Stitch, a
+strategy is characterized as a tree of condition-action-delay decision
+nodes, with explicitly defined probabilities for conditions and
+a delay time-window for observing tactic effects. A strategy also
+specifies an applicability condition as a predicate that is evaluated
+on the model during strategy selection.
+
+#### Challenge 
+
+This strategy combines the Captcha and Reauthenticate
+tactics. If Captcha is not enabled, then the strategy will enable it,
+otherwise it will enforce re-authentication.
+
+#### Eliminate
+
+This strategy combines the blackhole and throttling tactics.
+If there are clients that we are confident are malicious, then
+this strategy will add them to the blacklist; otherwise, if there are
+clients that we find suspicious, we will throttle them.
+
+#### Outgun
+
+This strategy combines the tactics for adding capacity and
+reducing service to try to outgun the attack.
+
 Source: [Architecture-Based Self-Protection: Composing and
 Reasoning about Denial-of-Service Mitigations](http://www.cs.cmu.edu/~jcmoreno/files/hotsos14.pdf)
