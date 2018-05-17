@@ -1,6 +1,3 @@
-Extension:  Stitch scripts must have the extension ".s"; otherwise, the
-Adaptation Manager will not know to load it.
-
 # DoS Self-Protection approach using Rainbow
 
 To improve a system’s security, it is first necessary to develop a repertoire of countermeasures that can be applied in to the system.
@@ -105,5 +102,10 @@ clients that we find suspicious, we will throttle them.
 This strategy combines the tactics for adding capacity and
 reducing service to try to outgun the attack.
 
+----
+
+PS: Extension - Stitch scripts must have the extension ".s"; otherwise, the Adaptation Manager will not know to load it.
+
 Source: [Architecture-Based Self-Protection: Composing and
 Reasoning about Denial-of-Service Mitigations](http://www.cs.cmu.edu/~jcmoreno/files/hotsos14.pdf)
+
