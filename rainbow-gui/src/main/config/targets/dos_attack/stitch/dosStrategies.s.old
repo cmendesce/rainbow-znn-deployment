@@ -31,7 +31,9 @@ define boolean cHiRespTime = exists c : T.ClientT/*,D.ZNewsClientT*/ in M.compon
 
 // There is atleast one reserve server available
 define boolean serversAvailable = ZNN.availableServices(M,T.ServerT) > 0;
-	
+
+
+
 /* Stop the attack by placing attackers into a blackhole.  This strategy is triggered
  * by the presence of an attacker and an impact on response time
  */

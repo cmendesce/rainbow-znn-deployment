@@ -59,13 +59,19 @@ effectors:
     location: "${cusomize.system.target.web2}"
     command: "${customize.system.target.lb}.forceReauthentication()"
       
-  enableCaptcha-web0: 
+  enableCaptcha-web0:
     location: "${customize.system.target.web0}"
-    command: "${customize.system.target.lb}.setCaptchaEnabled (true)"
+    command: "${customize.system.target.lb}.setFidelity($<fidelity>)"
     type: script
     scriptInfo:
-      path: "/opt/znn/effectors/captcha"
-      argument: "on /opt/znn/captcha.on"
+      path    : "${_effectors.commonPath}/changeFidelity.sh"
+      argument: "5 /tmp/znn-fidelity-${customize.system.target.web0.httpPort}"
+    #location: "${customize.system.target.web0}"
+    #command: "${customize.system.target.lb}.setCaptchaEnabled (true)"
+    #type: script
+    #scriptInfo:
+    #  path: "/opt/znn/effectors/captcha"
+    #  argument: "on /opt/znn/captcha.on"
       
   enableCaptcha-lb: 
     location: "${customize.system.target.lb}"

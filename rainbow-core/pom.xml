@@ -19,7 +19,7 @@
 	<packaging>jar</packaging>
 	<!-- Version. This should *always* be a snapshot version by convention.
 		Name should be <version-number>-SNAPSHOT. -->
-	<version>2.1.1-SNAPSHOT</version>
+	<version>2.2.0-SNAPSHOT</version>
 	<!-- User readable name of the pom. -->
 	<name>Rainbow Core</name>
 	<!-- URL for the project site. -->
@@ -518,21 +518,6 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>rainbow</groupId>
-			<artifactId>rainbow-acme-model</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>rainbow</groupId>
-			<artifactId>rainbow-stitch</artifactId>
-			<version>2.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>rainbow</groupId>
-			<artifactId>rainbow-utility-model</artifactId>
-			<version>2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
