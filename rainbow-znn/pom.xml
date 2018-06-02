@@ -9,48 +9,13 @@
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
 
-	<!-- Software licences go here. -->
-	<licenses>
-		<!-- One block for each software license. -->
-		<license>
-			<!-- Description of the license. -->
-			<comments>
-				Not yet defined.
-			</comments>
-			<!-- How may the software be distributed? -->
-			<distribution>manual</distribution>
-			<!-- Name of the license. -->
-			<name>Unknown</name>
-		</license>
-	</licenses>
-
-	<!-- Organization which has owns the software. -->
-	<organization>
-		<!-- Organization name. -->
-		<name>We</name>
-		<!-- Organization URL. -->
-		<url>http://www.we.com</url>
-	</organization>
-
-	<!-- List of application developers. -->
 	<developers>
-		<!-- One block per developer. -->
 		<developer>
-			<!-- Unique ID for the developer. This ID is referenced in the changelog. -->
 			<id>schmerl</id>
-			<!-- Developer name. -->
 			<name>Bradley Schmerl</name>
-			<!-- Developer e-mail address. -->
 			<email>schmerl@cs.cmu.edu</email>
-			<!-- Organization to which the developer belongs. -->
 			<organization>CMU</organization>
-			<!-- Developer time zone. -->
 			<timezone>-5</timezone>
-			<!-- Developer roles. -->
-			<roles>
-				<!-- Role name. -->
-				<role />
-			</roles>
 		</developer>
 		<developer>
 			<id>pasc</id>
@@ -63,30 +28,13 @@
 			</roles>
 		</developer>
 	</developers>
-
-	<!-- Other people who have contributed to the project. Each 'contributor' 
-		entry has the same format as the 'developer' tag above but no ID is required. -->
-	<contributors>
-		<!--<contributor> <name></name> <email></email> <organization></organization> 
-			<roles> <role /> </roles> </contributor> -->
-	</contributors>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - SOURCE CONTROL VERSION CONFIGURATION - - - - - - - - - - - - - - - 
-		- - - - - - - - - - - - - - - - - - - - -->
-
-	<!-- Please note that the URL of the projects will have automatically the 
-		artifact name of the super-pom added to the end. -->
 	<scm>
-		<!-- Source control version, should have the format: scm:svn:http://<host>[:<port>]/<path>. -->
 		<connection>
 			scm:svn:svn://acme.able.cs.cmu.edu/rainbow/v2/trunk
 		</connection>
-		<!-- Source control version, should have the format: scm:svn:http://<host>[:<port>]/<path>. -->
 		<developerConnection>
 			scm:svn:svn://acme.able.cs.cmu.edu/rainbow/v2/trunk
 		</developerConnection>
-		<!-- URL for the source control. -->
 		<url>svn://acme.able.cs.cmu.edu/rainbow/v2/trunk</url>
 	</scm>
 	<build>
@@ -99,7 +47,6 @@
 				<version>1.0-beta-2</version>
 			</extension>
 		</extensions>
-
 		<!-- This is required to generate the site with maven 3. -->
 		<pluginManagement>
 			<plugins>
@@ -110,6 +57,7 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -135,7 +83,6 @@
 					</tagBase>
 				</configuration>
 			</plugin>
-
 			<!-- Plugin which defines the build number. -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -150,7 +97,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<!-- Plugin that creates the jar. We configure the plugin to place the 
 				build number in the jar's manifest. The goal 'test-jar' allows creating a 
 				jar file with test code. -->
@@ -180,7 +126,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
 			<!-- Configure the surefire plugin (which runs unit tests). We change 
 				the default configuration in order not to stop the builds if unit tests fail. 
 				We also add the project's base directory in the classpath. -->
@@ -198,8 +143,6 @@
 					</additionalClasspathElements>
 				</configuration>
 			</plugin>
-			
-
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -214,16 +157,56 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/config</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<imageName>cmendes/${project.artifactId}</imageName>
+					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-	
-		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - JAR REPOSITORIES - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - - - - - - - - -->
 
 	<repositories>
-		<!-- We define a single repository which is accessible through web-dav. 
-			The format (for webdav repositories) is dav:http://[<username>[:<password>]]@<host>[:<port>]/<path> -->
 		<repository>
 			<id>able.maven.repository</id>
 			<url>
@@ -231,11 +214,6 @@
 			</url>
 		</repository>
 	</repositories>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - REPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - - - -->
-
 	<reporting>
 		<plugins>
 			<plugin>

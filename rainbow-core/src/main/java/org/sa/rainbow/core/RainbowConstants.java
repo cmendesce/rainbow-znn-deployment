@@ -77,6 +77,8 @@ public interface RainbowConstants {
     String DEFAULT_TARGET_NAME = "default";
     /** Property key for the Rainbow configuration base path */
     String PROPKEY_BIN_PATH = "rainbow.binary";
+    /** Property key for the Rainbow configuration base path in development enviroment */
+    String PROPKEY_DEV_BASE_PATH = "rainbow.config.dev";
     /** Property key for the Rainbow configuration base path */
     String PROPKEY_CONFIG_PATH = "rainbow.config";
     /** Property key for the Rainbow configuration file */
