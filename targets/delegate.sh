@@ -52,4 +52,4 @@ if [ ! -f "$RB_PROPS" ]; then
 	(cd "$TARGET_DIR" && ln -s "$FOUND" rainbow.properties)
 fi
 
-java -classpath ".:lib/*"  -XX:+HeapDumpOnOutOfMemoryError $DEBUG -Drainbow.target=$TARGET org.sa.rainbow.core.RainbowDelegate
+java -classpath ".:lib/*"  -XX:+HeapDumpOnOutOfMemoryError $DEBUG -Drainbow.target=$TARGET org.sa.rainbow.ApplicationDelegate
