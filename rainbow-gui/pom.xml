@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
+    <name>Rainbow GUI</name>
     <build>
         <plugins>
             <plugin>
@@ -18,28 +19,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/config</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -54,7 +33,7 @@
         <dependency>
             <groupId>rainbow</groupId>
             <artifactId>rainbow-acme-model</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>2.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>rainbow</groupId>
@@ -64,12 +43,12 @@
         <dependency>
             <groupId>rainbow</groupId>
             <artifactId>rainbow-utility-model</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>rainbow</groupId>
             <artifactId>rainbow-znn</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>2.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: rainbow:rainbow-stitch:2.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/rainbow/rainbow-stitch/2.1-SNAPSHOT/rainbow-stitch-2.1-20160210.183451-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/rainbow/rainbow-stitch/2.1-SNAPSHOT/rainbow-stitch-2.1-20160210.183451-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/rainbow/rainbow-stitch/2.1-SNAPSHOT/rainbow-stitch-2.1-20160210.183451-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

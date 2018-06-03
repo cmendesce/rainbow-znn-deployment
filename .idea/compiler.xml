@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="rainbow-acme-model" />
+        <module name="rainbow-core" />
+        <module name="rainbow-gui" />
+        <module name="rainbow-utility-model" />
+        <module name="rainbow-znn" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rainbow" target="1.5" />
+      <module name="rainbow-acme-model" target="1.7" />
+      <module name="rainbow-core" target="1.7" />
+      <module name="rainbow-gui" target="1.8" />
+      <module name="rainbow-stitch" target="1.7" />
+      <module name="rainbow-utility-model" target="1.7" />
+      <module name="rainbow-znn" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -11,5 +11,8 @@
         <module>rainbow-core</module>
         <module>rainbow-znn</module>
         <module>rainbow-gui</module>
+        <module>rainbow-utility-model</module>
+        <module>rainbow-acme-model</module>
+        <module>rainbow-stitch</module>
     </modules>
 </project>

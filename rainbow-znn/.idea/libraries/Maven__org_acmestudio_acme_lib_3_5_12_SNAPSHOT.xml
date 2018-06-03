@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.acmestudio:acme-lib:3.5.12-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/acmestudio/acme-lib/3.5.12-SNAPSHOT/acme-lib-3.5.12-20170731.212057-9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/acmestudio/acme-lib/3.5.12-SNAPSHOT/acme-lib-3.5.12-20170731.212057-9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/acmestudio/acme-lib/3.5.12-SNAPSHOT/acme-lib-3.5.12-20170731.212057-9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

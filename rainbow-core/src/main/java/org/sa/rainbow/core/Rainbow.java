@@ -32,7 +32,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +48,7 @@ import org.sa.rainbow.core.globals.ExitState;
 import org.sa.rainbow.util.Util;
 
 import static java.text.MessageFormat.format;
+import static org.sa.rainbow.util.PropertiesUtils.*;
 
 /**
  * A singleton class that provides utilities for reading properties, and getting access to important Rainbow Framework
@@ -147,30 +147,12 @@ public class Rainbow implements IRainbowEnvironment {
 
     private Rainbow () {
         m_props = new Properties();
-        loadDevProperties();
         m_id2Gauge = new HashMap<> ();
         m_threadGroup = new ThreadGroup (NAME);
         establishPaths ();
         loadConfigFiles ();
         canonicalizeHost2IPs ();
         evalPropertySubstitution ();
-    }
-
-    private void loadDevProperties() {
-        try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            InputStream stream = loader.getResourceAsStream("rainbow-dev.properties");
-            if (stream != null) {
-                Properties properties = new Properties();
-                properties.load(stream);
-                for (Object key : properties.keySet()) {
-                    LOGGER.info(format("Property {0} added to the System's properties.", key));
-                    System.setProperty(key.toString(), properties.getProperty(key.toString()));
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("Configuration file for development environment not found.", e);
-        }
     }
 
     @Override
@@ -277,9 +259,9 @@ public class Rainbow implements IRainbowEnvironment {
      * Determines and configures the paths to the Rainbow base installation and target configuration files
      */
     private void establishPaths () {
-        String cfgPath = System.getProperty (PROPKEY_CONFIG_PATH, RAINBOW_CONFIG_PATH); // The location of targets
-        String target = System.getProperty (PROPKEY_TARGET_NAME, DEFAULT_TARGET_NAME); // The target to use
-        String propFile = System.getProperty (PROPKEY_CONFIG_FILE, null);
+        String cfgPath = getEnvOrProperty(PROPKEY_CONFIG_PATH, DEFAULT_CONFIG_FILE);
+        String target = getEnvOrProperty(PROPKEY_TARGET_NAME, DEFAULT_TARGET_NAME);
+        String propFile = getEnvOrProperty(PROPKEY_CONFIG_FILE);
 
         m_props.setProperty (PROPKEY_CONFIG_PATH, cfgPath);
         m_props.setProperty (PROPKEY_TARGET_NAME, target);
@@ -310,7 +292,6 @@ public class Rainbow implements IRainbowEnvironment {
                 throw new RainbowAbortException (errMsg);
             }
         }
-
     }
 
     /**
@@ -333,17 +314,11 @@ public class Rainbow implements IRainbowEnvironment {
         computeHostSpecificConfig ();
         String cfgFile = m_props.getProperty (PROPKEY_CONFIG_FILE, DEFAULT_CONFIG_FILE);
         List<String> cfgFiles = new ArrayList<> ();
-//        if (!cfgFile.equals (DEFAULT_CONFIG_FILE)) { 
-//            // load commong config file first
-//            cfgFiles.add (DEFAULT_CONFIG_FILE);
-//        }
         cfgFiles.add (cfgFile);
         LOGGER.debug (
                 format ("Loading Rainbow config file(s): {0}", Arrays.toString (cfgFiles.toArray ())));
 
-        // Load the properties in each cfgFile into the m_props of this method. This constitutes the properties of
-        // Rainbow
-        // for this host.
+        // Load the properties in each cfgFile into the m_props of this method. This constitutes the properties of Rainbow for this host.
         for (String cfg : cfgFiles) {
             try (FileInputStream pfIn = new FileInputStream (Util.getRelativeToPath (m_targetPath, cfg))) {
                 m_props.load (pfIn);
@@ -372,15 +347,6 @@ public class Rainbow implements IRainbowEnvironment {
             String hostLoc = m_props.getProperty (key);
             canonicalizeHost2IP ("Target host location", hostLoc, key);
         }
-
-//        // Resolve all of the mentioned target locations
-//        int cnt = Integer.parseInt (m_props.getProperty (PROPKEY_TARGET_LOCATION + Util.SIZE_SFX, "0"));
-//        for (int i = 0; i < cnt; i++) {
-//            String propName = RainbowConstants.PROPKEY_TARGET_LOCATION + Util.DOT + i;
-//            String hostLoc = m_props.getProperty (propName);
-//            canonicalizeHost2IP ("Target host location", hostLoc, propName);
-//        }
-
     }
 
     /**
@@ -388,9 +354,9 @@ public class Rainbow implements IRainbowEnvironment {
      */
     private void evalPropertySubstitution () {
         for (Object kObj : m_props.keySet ()) {
-            String key = (String )kObj;
-            String val = m_props.getProperty (key);
-            while (val.contains (Util.TOKEN_BEGIN)) {
+            String key = (String) kObj;
+            String val = m_props.getProperty(key);
+            while (val.contains(Util.TOKEN_BEGIN)) {
                 m_props.setProperty (key, Util.evalTokens (val, m_props));
                 val = m_props.getProperty (key);
             }
@@ -399,10 +365,11 @@ public class Rainbow implements IRainbowEnvironment {
 
     public static String canonicalizeHost2IP (String host) {
         try {
-            host = InetAddress.getByName (host).getHostAddress ();
-        }
-        catch (UnknownHostException e) {
-            LOGGER.error (format ("{0} could not be resolved to an IP using the given name.", host));
+            if (InetAddress.getLocalHost().isReachable(10000)) {
+                host = InetAddress.getByName(host).getHostAddress();
+            }
+        } catch (IOException e) {
+            LOGGER.error (format ("{0} could not be resolved to an IP using the given name.", host), e);
         }
         return host;
     }
@@ -414,11 +381,7 @@ public class Rainbow implements IRainbowEnvironment {
             m_props.setProperty (key, masterLoc);
         }
         catch (UnknownHostException e) {
-            LOGGER.warn (
-                    format (
-                            "{1} ''{0}'' could not be resolved to an IP using the given name.",
-                            masterLoc, string),
-                    e);
+            LOGGER.warn (format ("{1} ''{0}'' could not be resolved to an IP using the given name.", masterLoc, string), e);
         }
     }
 
@@ -523,12 +486,10 @@ public class Rainbow implements IRainbowEnvironment {
         return good;
     }
 
-
     @Override
     public ThreadGroup getThreadGroup () {
         return m_threadGroup;
     }
-
 
     @Override
     public File getTargetPath () {
@@ -547,27 +508,19 @@ public class Rainbow implements IRainbowEnvironment {
 
     @Override
     public void registerGauge (IGauge gauge) {
-        ;
         Rainbow.m_id2Gauge.put (gauge.id (), gauge);
     }
 
     @Override
     public IGauge lookupGauge (String id) {
-        ;
         return Rainbow.m_id2Gauge.get (id);
     }
 
     @Override
     public Environment environment () {
-        ;
         if (Rainbow.m_env == Environment.UNKNOWN) {
             Rainbow.m_env = Environment.valueOf (getProperty (PROPKEY_DEPLOYMENT_ENVIRONMENT).toUpperCase ());
         }
         return Rainbow.m_env;
     }
-
-
-
-
-
 }

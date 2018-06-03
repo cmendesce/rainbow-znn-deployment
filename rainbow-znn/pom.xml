@@ -4,9 +4,14 @@
 	<groupId>rainbow</groupId>
 	<artifactId>rainbow-znn</artifactId>
 	<packaging>jar</packaging>
-	<version>2.1-SNAPSHOT</version>
-	<properties>
+	<version>2.2-SNAPSHOT</version>
+	<name>Rainbow ZNN Deployment</name>
+    <properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<docker.image.prefix>cmendes</docker.image.prefix>
+		<docker.plugin.version>1.1.1</docker.plugin.version>
 	</properties>
 
 	<developers>
@@ -23,9 +28,13 @@
 			<email>paulo.casanova@cs.cmu.edu</email>
 			<organization>CMU</organization>
 			<timezone>0</timezone>
-			<roles>
-				<role />
-			</roles>
+		</developer>
+		<developer>
+			<id>cmendesce</id>
+			<name>Carlos Mendes</name>
+			<email>cmendesce@gmail.com</email>
+			<organization>Unifor</organization>
+			<timezone>-3</timezone>
 		</developer>
 	</developers>
 	<scm>
@@ -38,56 +47,24 @@
 		<url>svn://acme.able.cs.cmu.edu/rainbow/v2/trunk</url>
 	</scm>
 	<build>
-			<extensions>
-			<!-- The wagon extension allows webdav access. This plugin is required 
-				to deploy to the repository. -->
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav</artifactId>
-				<version>1.0-beta-2</version>
-			</extension>
-		</extensions>
-		<!-- This is required to generate the site with maven 3. -->
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>3.2</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.7.0</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<excludes>
 					   <exclude>org/sa/rainbow/translator/znn/gauges/DiagnosisGauge.java</exclude>
 					   <exclude>org/sa/rainbow/translator/znn/gauges/EchoGauge.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
-			<!-- Configure the release plugin to set the place where tags should be 
-				done. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<tagBase>
-						http://svn.homenet/svn/projects/incubator/tags
-					</tagBase>
-				</configuration>
-			</plugin>
 			<!-- Plugin which defines the build number. -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.1</version>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -97,34 +74,34 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Plugin that creates the jar. We configure the plugin to place the 
-				build number in the jar's manifest. The goal 'test-jar' allows creating a 
-				jar file with test code. -->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.1.0</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>true</addMavenDescriptor>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>org.sa.rainbow.RainbowZnnApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.0.2.RELEASE</version>
 				<executions>
 					<execution>
 						<goals>
-							<goal>test-jar</goal>
+							<goal>repackage</goal>
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>
-								true
-							</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Build>
-								${buildNumber}
-							</Implementation-Build>
-						</manifestEntries>
-					</archive>
-				</configuration>
 			</plugin>
 			<!-- Configure the surefire plugin (which runs unit tests). We change 
 				the default configuration in order not to stop the builds if unit tests fail. 
@@ -144,45 +121,9 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/config</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>1.1.1</version>
+				<version>${docker.plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>install</phase>
@@ -192,7 +133,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<imageName>cmendes/${project.artifactId}</imageName>
+					<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
 					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
 					<resources>
 						<resource>
@@ -205,7 +146,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<repositories>
 		<repository>
 			<id>able.maven.repository</id>
@@ -214,184 +154,7 @@
 			</url>
 		</repository>
 	</repositories>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.6</version>
-			</plugin>
 
-			<!-- Plugin which generates the javadoc report. -->
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<docfilessubdirs>true</docfilessubdirs>
-				</configuration>
-			</plugin>
-
-			<!-- Plugin which adds cross-referenced sources. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.3</version>
-			</plugin>
-
-			<!-- Plugin generating the surefire report. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.12.4</version>
-			</plugin>
-
-			<!-- Plugin which generates the test coverage report. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5.2</version>
-			</plugin>
-
-			<!-- Plugin generating the changelog. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-changes-plugin</artifactId>
-				<version>2.8</version>
-			</plugin>
-
-			<!-- Plugin with the todo report. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<tags>
-						<tag>TODO</tag>
-						<tag>FIXME</tag>
-						<tag>IDEA</tag>
-						<tag>@todo</tag>
-						<tag>@deprecated</tag>
-					</tags>
-				</configuration>
-			</plugin>
-
-			<!-- Plugin generating the PMD report ("bug" detector). -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.7.1</version>
-				<configuration>
-					<sourceEncoding>iso8859-1</sourceEncoding>
-					<minimumTokens>100</minimumTokens>
-					<targetJdk>1.6</targetJdk>
-					<excludes>
-						<exclude>**/*Bean.java</exclude>
-						<exclude>**/generated/*.java</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-
-			<!-- Plugin generating the findbugs report. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.2</version>
-			</plugin>
-
-			<!-- Plugin for the checkstyle report. It assumes a checkstyle-config.xml 
-				file exists in the root of the project. -->
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-checkstyle-plugin</artifactId> 
-				<version>2.5</version> <configuration> <configLocation>checkstyle.xml</configLocation> 
-				</configuration> </plugin> -->
-		</plugins>
-	</reporting>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - DEPLOYMENT CONFIGURATION - - - - - - - - - - - - - - - - - - - - - 
-		- - - - - - - - - - - - - - -->
-
-	<distributionManagement>
-		<!-- Website location. Do not forget it should start with scp: and not 
-			http. The user/password used for authentication should also be added. -->
-		<!-- <site> <id>website</id> <url>scp://automatik:automatik@localhost:/home/pasc/mse/studio/mvnroot</url> 
-			</site> -->
-
-		<!-- Location of the repository where the jars should be added. It should 
-			have the following format: dav:http://<user>:<pass>@<host>[:<port>]/<path> -->
-		<repository>
-			<id>able.maven.repository</id>
-			<name>ABLE maven repository</name>
-			<url>
-				dav:http://acme.able.cs.cmu.edu/maven-repository
-			</url>
-		</repository>
-	</distributionManagement>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - PROFILE CONFIGURATION - - - - - - - - - - - - - - - - - - - - - - - 
-		- - - - - - - - - - - - -->
-
-	<!-- - We define three profiles. One, the "dev-std" is the standard development 
-		- profile (as the name indicates). This profile is the default one. - - The 
-		full-test profile runs all "normal" tests plus the slow tests (the - tests 
-		which end in "TestSlow"). - - The no-tests profile does not run any unit 
-		tests. -->
-	<profiles>
-		<profile>
-			<id>dev-std</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>**/*Test.java</include>
-								<include>**/*TestCase.java</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>full-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>**/*Test.java</include>
-								<include>**/*TestCase.java</include>
-								<include>**/*TestSlow.java</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>no-tests</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>TestIgnore</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>rainbow</groupId>
@@ -401,7 +164,7 @@
 		<dependency>
 			<groupId>rainbow</groupId>
 			<artifactId>rainbow-acme-model</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>rainbow</groupId>
@@ -411,7 +174,7 @@
 		<dependency>
 			<groupId>rainbow</groupId>
 			<artifactId>rainbow-utility-model</artifactId>
-			<version>2.0-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>auxtestlib</groupId>
