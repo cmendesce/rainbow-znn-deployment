@@ -44,7 +44,11 @@ import org.sa.rainbow.core.ports.RainbowPortFactory;
 import org.sa.rainbow.translator.effectors.LocalEffectorManager;
 import org.sa.rainbow.translator.probes.LocalProbeManager;
 import org.sa.rainbow.util.Beacon;
+import org.sa.rainbow.util.PropertiesUtils;
 import org.sa.rainbow.util.Util;
+
+import static org.sa.rainbow.core.RainbowConstants.*;
+import static org.sa.rainbow.util.PropertiesUtils.*;
 
 public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowConstants {
 
@@ -93,8 +97,12 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
 
     public RainbowDelegate () {
         super (NAME);
-        // Generate an ID 
-        m_id = UUID.randomUUID ().toString ();
+        // Generate an ID
+        String id = getEnvOrProperty(PROPKEY_DELEGATE_ID);
+        if (id == null) {
+             id = Rainbow.instance().getProperty(PROPKEY_DEPLOYMENT_LOCATION, UUID.randomUUID ().toString ()).replace('.', '-');
+        }
+        m_id = id;
     }
 
     public void initialize () throws RainbowConnectionException {
@@ -123,7 +131,7 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
 
     private Properties getConnectionProperties () {
         Properties props = new Properties ();
-        props.setProperty (RainbowConstants.PROPKEY_DEPLOYMENT_LOCATION, Rainbow.instance ().getProperty
+        props.setProperty (PROPKEY_DEPLOYMENT_LOCATION, Rainbow.instance ().getProperty
                 (PROPKEY_DEPLOYMENT_LOCATION));
         return props;
     }
