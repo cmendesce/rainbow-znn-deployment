@@ -27,9 +27,9 @@
 package org.sa.rainbow.gui;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.log4j.Logger;
 import org.sa.rainbow.core.*;
 import org.sa.rainbow.core.error.RainbowConnectionException;
-import org.sa.rainbow.core.error.RainbowException;
 import org.sa.rainbow.core.gauges.OperationRepresentation;
 import org.sa.rainbow.core.globals.ExitState;
 import org.sa.rainbow.core.models.ModelReference;
@@ -81,6 +81,8 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
     /** Convenience constant: size of text field to set to when Max is exceeded. */
     public static final int   TEXT_HALF_LENGTH = 50000;
 
+    private final Logger logger = Logger.getLogger(RainbowGUI.class);
+
     private JFrame m_frame = null;
 
     private JTextArea[] m_textAreas = null;
@@ -113,17 +115,15 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
         m_master = master;
         try {
             if (m_master == null) {
-//                RainbowPortFactory.createDelegateMasterConnectionPort (null);
                 m_master = RainbowPortFactory.createMasterCommandPort ();
             }
             IRainbowReportingSubscriberPort reportingSubscriberPort = RainbowPortFactory
                     .createReportingSubscriberPort (this);
             reportingSubscriberPort.subscribe (EnumSet.allOf (RainbowComponentT.class),
-                                               EnumSet.allOf (ReportType.class));
+                    EnumSet.allOf (ReportType.class));
 
         } catch (RainbowConnectionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace ();
+            logger.error("GUI didn't start. " + e.getMessage(), e);
         }
     }
 
@@ -168,8 +168,8 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
             }
         }).start ();
         int ret = JOptionPane.showOptionDialog (m_frame, "Waiting for Rainbow to shutdown. Continue to wait?",
-                                                "Quitting", JOptionPane.YES_NO_OPTION, JOptionPane
-                                                        .INFORMATION_MESSAGE, null, null, null);
+                "Quitting", JOptionPane.YES_NO_OPTION, JOptionPane
+                        .INFORMATION_MESSAGE, null, null, null);
 
         if (ret == JOptionPane.NO_OPTION) {
             System.exit (RainbowConstants.EXIT_VALUE_ABORT);
@@ -237,7 +237,7 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
 
         //Create and set up the window.
         m_frame = new JFrame ("Rainbow Framework GUI - Target " + Rainbow.instance ().getProperty (RainbowConstants
-                                                                                               .PROPKEY_TARGET_NAME));
+                .PROPKEY_TARGET_NAME));
         m_frame.setDefaultCloseOperation (JFrame.DO_NOTHING_ON_CLOSE);
         m_frame.addWindowListener (new WindowAdapter () {
             @Override
@@ -575,13 +575,13 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
             @Override
             public void actionPerformed (ActionEvent e) {
                 String operationName = JOptionPane.showInputDialog (m_frame,
-                                                                    "Please identify the Operation to test:");
+                        "Please identify the Operation to test:");
                 if (operationName == null || operationName.isEmpty ()) {
                     writeText (ID_ORACLE_MESSAGE, "Sorry, Oracel needs to know what operation to invoke.");
                 }
 
                 String argStr = JOptionPane.showInputDialog (m_frame,
-                                                             "Please provide string arguments, separated by ','");
+                        "Please provide string arguments, separated by ','");
                 String[] args;
                 if (argStr == null || argStr.isEmpty ()) {
                     args = new String[0];
@@ -590,8 +590,8 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
                 }
                 String modelRef = JOptionPane
                         .showInputDialog (m_frame,
-                                          "Please identify the model to run the operation on: modelName:modelType (or" +
-                                                  " just 'modelName' for Acme)");
+                                "Please identify the model to run the operation on: modelName:modelType (or" +
+                                        " just 'modelName' for Acme)");
                 ModelReference model = Util.decomposeModelReference (modelRef);
                 if (model.getModelType () == null || model.getModelType ().isEmpty ()) {
                     model = new ModelReference (model.getModelName (), "Acme");
@@ -609,9 +609,9 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
             @Override
             public void actionPerformed (ActionEvent e) {
                 String mr = JOptionPane.showInputDialog (m_frame,
-                                                         "Please identify the model to run the operation on: " +
-                                                                 "modelName:modelType (or" +
-                                                                 " just 'modelName' for Acme)");
+                        "Please identify the model to run the operation on: " +
+                                "modelName:modelType (or" +
+                                " just 'modelName' for Acme)");
                 ModelReference model = Util.decomposeModelReference (mr);
                 if (model.getModelType () == null || model.getModelType ().isEmpty ()) {
                     model = new ModelReference (model.getModelName (), "Acme");
@@ -628,7 +628,7 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
                 }
 
                 String argStr = JOptionPane.showInputDialog (m_frame,
-                                                             "Please provide string arguments, separated by ','");
+                        "Please provide string arguments, separated by ','");
                 String[] args;
                 if (argStr == null || argStr.isEmpty ()) {
                     args = new String[0];
@@ -783,9 +783,9 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
     // GUI invoked test methods
     private void testModelOperation (ModelReference model, String operation, String[] args) {
         OperationRepresentation or = new OperationRepresentation (operation, model, args[0], Arrays.copyOfRange (args,
-                                                                                                                 1,
-                                                                                                                 args
-                                                                                                                         .length));
+                1,
+                args
+                        .length));
         or.setOrigin ("GUI");
         if (m_usPort == null) {
             try {
@@ -858,39 +858,38 @@ public class RainbowGUI implements IDisposable, IRainbowReportingSubscriberCallb
         Util.dataLogger ().info (msg);
         int panel = ID_ORACLE_MESSAGE;
         switch (component) {
-        case ADAPTATION_MANAGER:
-            panel = ID_ADAPTATION_MANAGER;
-            break;
-        case ANALYSIS:
-            panel = ID_ARCH_EVALUATOR;
-            break;
-        case DELEGATE:
-        case MASTER:
-            panel = ID_ORACLE_MESSAGE;
-            break;
-        case EFFECTOR:
-        case EFFECTOR_MANAGER:
-            panel = ID_TRANSLATOR;
-            break;
-        case EXECUTOR:
-            panel = ID_EXECUTOR;
-            break;
-        case GAUGE:
-        case GAUGE_MANAGER:
-            panel = ID_GAUGES;
-            break;
-        case MODEL:
-            panel = ID_MODEL_MANAGER;
-            break;
-        case PROBE:
-        case PROBE_MANAGER:
-            panel = ID_TARGET_SYSTEM;
-            break;
-        case SELECTOR:
-            panel = ID_ADAPTATION_MANAGER;
-            break;
+            case ADAPTATION_MANAGER:
+                panel = ID_ADAPTATION_MANAGER;
+                break;
+            case ANALYSIS:
+                panel = ID_ARCH_EVALUATOR;
+                break;
+            case DELEGATE:
+            case MASTER:
+                panel = ID_ORACLE_MESSAGE;
+                break;
+            case EFFECTOR:
+            case EFFECTOR_MANAGER:
+                panel = ID_TRANSLATOR;
+                break;
+            case EXECUTOR:
+                panel = ID_EXECUTOR;
+                break;
+            case GAUGE:
+            case GAUGE_MANAGER:
+                panel = ID_GAUGES;
+                break;
+            case MODEL:
+                panel = ID_MODEL_MANAGER;
+                break;
+            case PROBE:
+            case PROBE_MANAGER:
+                panel = ID_TARGET_SYSTEM;
+                break;
+            case SELECTOR:
+                panel = ID_ADAPTATION_MANAGER;
+                break;
         }
         writeText (panel, msg);
     }
-
 }

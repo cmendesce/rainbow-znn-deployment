@@ -14,5 +14,6 @@
         <module>rainbow-utility-model</module>
         <module>rainbow-acme-model</module>
         <module>rainbow-stitch</module>
+        <module>rainbow-api</module>
     </modules>
 </project>

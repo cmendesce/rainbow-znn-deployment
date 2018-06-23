@@ -1,0 +1,31 @@
+version: "3.6"
+
+services:
+  delegate:
+    image: cmendes/rainbow-znn:latest
+    hostname: delegate1
+    networks:
+      - rainbow
+    environment:
+      - rainbow.target=dockercompose
+      - rainbow.config=targets
+      - MODE=delegate
+      - JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
+    volumes:
+      - ./targets:/targets
+  master:
+      image: cmendes/rainbow-znn:latest
+      hostname: master
+      networks:
+        - rainbow
+      ports:
+        - 1101:1101
+        - 8000:8000
+      environment:
+        - rainbow.target=dockercompose
+        - rainbow.config=targets
+        - MODE=master
+      volumes:
+        - ./targets:/targets
+networks:
+  rainbow:

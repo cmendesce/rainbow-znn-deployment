@@ -63,7 +63,7 @@ public class LocalProbeManager extends AbstractRainbowRunnable {
     @Override
     protected void log (String txt) {
         // TODO Auto-generated method stub
-
+        LOGGER.info(txt);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class LocalProbeManager extends AbstractRainbowRunnable {
         // obtain the list of probes to create
         for (ProbeDescription.ProbeAttributes pbAttr : m_localProbeDesc.probes) {
             // see if probe is for my location
-            if (!pbAttr.getLocation().equals (Rainbow.instance ().getProperty (RainbowConstants.PROPKEY_DEPLOYMENT_LOCATION))) {
-                continue;
-            }
+            //if (!pbAttr.getLocation().equals (Rainbow.instance ().getProperty (RainbowConstants.PROPKEY_DEPLOYMENT_LOCATION))) {
+            //    continue;
+            //}
             try {
                 IProbe probe = null;
                 // prepare class info
@@ -202,6 +202,7 @@ public class LocalProbeManager extends AbstractRainbowRunnable {
         m_probesStarted = true;
         Collection<IProbe> probes = m_localProbes.values ();
         for (IProbe probe : probes) {
+            LOGGER.info("Trying to activate probe " + probe.name() + "@" + probe.location());
             probe.activate ();
         }
     }

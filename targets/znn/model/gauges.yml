@@ -1,0 +1,113 @@
+#
+# Gauge Type and Gauge Instance Specifications
+#  - time periods generally in milliseconds
+#
+gauge-types:
+
+  LoadGaugeT:
+    commands:
+      load : ServerT.setLoad(double)
+    setupParams:
+      targetIP:
+        type:    String
+        default: "localhost"
+      beaconPeriod:
+        type:    long
+        default: 20000
+      javaClass:
+        type:    String
+        default: "org.sa.rainbow.translator.znn.gauges.CpuLoadGauge"
+    configParams:
+      samplingFrequency:
+        type:    long
+        default: 1000
+      targetProbeType:
+        type:    String
+        default: ~
+    comment: "LoadGaugeT measures and reports CPU load of the target host"
+
+    ResponseTimeGaugeT:
+        commands:
+          end2endRespTime : ClientT.setResponseTime (float)
+        setupParams:
+          targetIP:
+            type:    String
+            default: "localhost"
+          beaconPeriod:
+            type:    long
+            default: 30000
+          javaClass:
+            type:    String
+            default: "org.sa.rainbow.translator.znn.gauges.End2EndRespTimeGauge"
+        configParams:
+          samplingFrequency:
+            type:    long
+            default: 1000
+          targetProbeType:
+            type:    String
+            default: ~
+        comment: "ResponseTimeGaugeT measures and reports the end-to-end response time from a client or its proxy."
+
+
+gauge-instances:
+
+  LoG0:
+    type:  LoadGaugeT
+    model: "ZNewsSys:Acme"
+    commands:
+      load : LB0.setLoad($<load>)
+    setupValues:
+      targetIP: "${customize.system.target.lb}"
+    configValues:
+      samplingFrequency: 1000
+      targetProbeType  : load
+    comment: "LoG0 is associated with the component LB0 of the System, ZNewsSys, defined as an Acme model"
+
+  LoG1:
+    type:  LoadGaugeT
+    model: "ZNewsSys:Acme"
+    commands:
+      load : Server0.setLoad($<load>)
+    setupValues:
+      targetIP: "${customize.system.target.web0}"
+    configValues:
+      samplingFrequency: 1000
+      targetProbeType  : load
+    comment: "LoG1 is associated with the component web0 of the System, ZNewsSys, defined as an Acme model"
+
+  LoG2:
+    type:  LoadGaugeT
+    model: "ZNewsSys:Acme"
+    commands:
+      load : Server1.setLoad($<load>)
+    setupValues:
+      targetIP: "${customize.system.target.web1}"
+    configValues:
+      samplingFrequency: 1000
+      targetProbeType  : load
+    comment: "LoG2 is associated with the component web1 of the System, ZNewsSys, defined as an Acme model"
+
+  LoG3:
+    type:  LoadGaugeT
+    model: "ZNewsSys:Acme"
+    commands:
+      load : ServerB0.setLoad($<load>)
+    setupValues:
+      targetIP: "${customize.system.target.web2}"
+    configValues:
+      samplingFrequency: 1000
+      targetProbeType  : load
+    comment: "LoG3 is associated with the component web2 of the System, ZNewsSys, defined as an Acme model"
+
+  EERTG1:
+    type:  ResponseTimeGaugeT
+    model: "ZNewsSys:Acme"
+    commands:
+      "setResponseTime(${customize.system.target.master})" : Client0.setExperRespTime($<end2endRespTime>)
+    setupValues:
+      targetIP: "${customize.system.target.master}"
+    configValues:
+      samplingFrequency: 1000
+      targetProbeType  : clientproxy@*
+    comment: "EERTG1 is associated with the client component of the System, ZNewsSys, defined as an Acme model"
+

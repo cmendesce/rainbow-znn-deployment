@@ -455,6 +455,7 @@ public final class AdaptationManager extends AbstractRainbowRunnable
         defineAttributes (stitch, attrVectorMap);
     }
 
+    private int tries = 0;
     /*
      * Algorithm: - Iterate through repertoire searching for enabled strategies,
      * where "enabled" means applicable to current system condition NOTE: A
@@ -465,6 +466,21 @@ public final class AdaptationManager extends AbstractRainbowRunnable
      * highest scoring strategy
      */
     private Strategy checkAdaptation () {
+
+        if (tries == 5) {
+            for (Stitch stitch : m_repertoire) {
+                for (Strategy strategy : stitch.script.strategies) {
+                    tries = 0;
+                    log("Selected strategy  " + strategy.getQualifiedName());
+                    return strategy;
+                }
+            }
+        } else {
+            log("I'll try soon");
+            tries++;
+            return null;
+        }
+
         log ("Checking if adaptation is required.");
         if (_stopWatchForTesting != null) {
             _stopWatchForTesting.start ();

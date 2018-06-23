@@ -26,6 +26,7 @@
  */
 package org.sa.rainbow.translator.znn.gauges;
 
+import org.apache.log4j.Logger;
 import org.sa.rainbow.core.error.RainbowException;
 import org.sa.rainbow.core.gauges.RegularPatternGauge;
 import org.sa.rainbow.core.models.commands.IRainbowOperation;
@@ -44,13 +45,16 @@ import java.util.regex.Pattern;
  */
 public class End2EndRespTimeGauge extends RegularPatternGauge {
 
+    private final Logger logger = Logger.getLogger(End2EndRespTimeGauge.class);
+
     public static final String         NAME              = "G - End-End Resp Time";
     /** Sample window to compute an average latency */
     public static final int AVG_SAMPLE_WINDOW = 5;
 
     /** List of values reported by this Gauge */
     private static final String[] valueNames = {
-            "end2endRespTime(*)"
+            "end2endRespTime(*)",
+            "setResponseTime(*)"
     };
     private static final String DEFAULT = "DEFAULT";
 
@@ -77,11 +81,14 @@ public class End2EndRespTimeGauge extends RegularPatternGauge {
      */
     @Override
     protected void doMatch (String matchName, Matcher m) {
+        logger.info("doMatch");
         if (matchName == DEFAULT) {
             // acquire the next set of ping RTT data, we care for the average
 //			String tstamp = m.group(1);
             String id = m.group (2);
-            String host = id.split ("@")[1];
+            String host = m.group(3);
+            //String host = id.split ("@")[1];
+            logger.info("host:"+host+" id:"+id);
 //            String host = m.group(3);
             if (host.equals("")) return;
             double dur = Double.parseDouble(m.group(4));
@@ -103,7 +110,7 @@ public class End2EndRespTimeGauge extends RegularPatternGauge {
             }
             m_cumulationMap.put(host, cumulation);  // store updated cumulation
             dur = cumulation / history.size();
-            m_reportingPort.trace (getComponentType (),
+            m_reportingPort.info (getComponentType (),
                     id () + ": " + cumulation + ", hist" + Arrays.toString (history.toArray ()));
 
             // update connection in model with latency in seconds

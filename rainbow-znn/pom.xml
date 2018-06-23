@@ -126,7 +126,7 @@
 				<version>${docker.plugin.version}</version>
 				<executions>
 					<execution>
-						<phase>deploy</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>build</goal>
 						</goals>
@@ -135,6 +135,7 @@
 				<configuration>
 					<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
 					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+					<noCache>true</noCache>
 					<resources>
 						<resource>
 							<targetPath>/</targetPath>

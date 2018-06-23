@@ -1,5 +1,6 @@
 package org.sa.rainbow;
 import org.apache.log4j.Logger;
+import org.sa.rainbow.core.Rainbow;
 import org.sa.rainbow.core.RainbowDelegate;
 import org.sa.rainbow.core.RainbowMaster;
 import org.sa.rainbow.core.error.RainbowConnectionException;
@@ -36,11 +37,27 @@ public class RainbowZnnApplication {
         RainbowDelegate del = new RainbowDelegate();
         del.initialize();
         del.start();
+        logger.info("Rainbow delegate started");
+
+        //logger.info("Starting probes from " + del.getId() + " delegate");
+        //del.startProbes();
     }
     private static void master() throws RainbowException {
         RainbowMaster master = new RainbowMaster ();
         master.initialize ();
+
+        RainbowDelegate localDelegate = new RainbowDelegate ();
+        localDelegate.initialize ();
+
         master.start ();
+        localDelegate.start ();
+
+
         RainbowPortFactory.createMasterCommandPort ();
+
+        /*RainbowMaster master = new RainbowMaster ();
+        master.initialize ();
+        master.start ();
+        RainbowPortFactory.createMasterCommandPort ();*/
     }
 }

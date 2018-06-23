@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.sa.rainbow.core.error.RainbowConnectionException;
 import org.sa.rainbow.core.gauges.GaugeInstanceDescription;
 import org.sa.rainbow.core.gauges.LocalGaugeManager;
@@ -44,14 +45,13 @@ import org.sa.rainbow.core.ports.RainbowPortFactory;
 import org.sa.rainbow.translator.effectors.LocalEffectorManager;
 import org.sa.rainbow.translator.probes.LocalProbeManager;
 import org.sa.rainbow.util.Beacon;
-import org.sa.rainbow.util.PropertiesUtils;
 import org.sa.rainbow.util.Util;
 
-import static org.sa.rainbow.core.RainbowConstants.*;
-import static org.sa.rainbow.util.PropertiesUtils.*;
+import static java.text.MessageFormat.*;
 
 public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowConstants {
 
+    Logger logger = Logger.getLogger(RainbowDelegate.class);
 
     enum ConnectionState {
         UNKNOWN, CONNECTING, CONNECTED, CONFIGURED
@@ -98,25 +98,22 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
     public RainbowDelegate () {
         super (NAME);
         // Generate an ID
-        String id = getEnvOrProperty(PROPKEY_DELEGATE_ID);
-        if (id == null) {
-             id = Rainbow.instance().getProperty(PROPKEY_DEPLOYMENT_LOCATION, UUID.randomUUID ().toString ()).replace('.', '-');
-        }
-        m_id = id;
+        m_id = UUID.randomUUID ().toString ();
     }
 
     public void initialize () throws RainbowConnectionException {
         // Create the connection to the master
         m_masterConnectionPort = RainbowPortFactory.createDelegateMasterConnectionPort (this);
-        log ("Attempting to connecto to master.");
+
         m_delegateState = ConnectionState.CONNECTING;
         m_reportingPort = m_masterConnectionPort;
+        logger.info ("Attempting to connect to master.");
         m_configurationPort = RainbowPortFactory.createDelegateConfigurationPort (this);
         m_masterPort = m_masterConnectionPort.connectDelegate (m_id, getConnectionProperties ());
         m_delegateState = ConnectionState.CONNECTED;
         // Request configuration information
 
-        m_masterPort.requestConfigurationInformation ();
+        //m_masterPort.requestConfigurationInformation ();
         m_probeManager = new LocalProbeManager (getId ());
         m_probeManager.initialize (m_masterConnectionPort);
         m_probeManager.start ();
@@ -125,13 +122,11 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
 
         m_effectorManager = new LocalEffectorManager (getId ());
         m_effectorManager.initialize (m_masterConnectionPort);
-
     }
-
 
     private Properties getConnectionProperties () {
         Properties props = new Properties ();
-        props.setProperty (PROPKEY_DEPLOYMENT_LOCATION, Rainbow.instance ().getProperty
+        props.setProperty (RainbowConstants.PROPKEY_DEPLOYMENT_LOCATION, Rainbow.instance ().getProperty
                 (PROPKEY_DEPLOYMENT_LOCATION));
         return props;
     }
@@ -143,9 +138,9 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
      *            The configuration information, as a set of properties
      */
     public synchronized void receiveConfigurationInformation (Properties props,
-            List<ProbeAttributes> probes,
-            List<EffectorAttributes> effectors,
-            List<GaugeInstanceDescription> gauges) {
+                                                              List<ProbeAttributes> probes,
+                                                              List<EffectorAttributes> effectors,
+                                                              List<GaugeInstanceDescription> gauges) {
         synchronized (m_probes) {
             // This might take some time, so record the information lest the method times out
             m_configurationInformation = props;
@@ -153,7 +148,7 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
             m_gauges.addAll (gauges);
             m_effectors.addAll (effectors);
         }
-        log ("Received configuration information.");
+        logger.info (format("Received configuration. {0} Properties; {1} Probes; {2} Effectors; {3} Gauges.", props.size(), probes.size(), effectors.size(), gauges.size()));
 
         // Process the period for sending the heartbeat
         long period = Long.parseLong (props.getProperty (PROPKEY_DELEGATE_BEACONPERIOD, "10000"));
@@ -176,12 +171,14 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
         m_delegateState = ConnectionState.CONFIGURED;
     }
 
-    void initDelegateComponents (List<ProbeAttributes> probes,
-            List<EffectorAttributes> effectors,
-            List<GaugeInstanceDescription> gauges) {
+    private void initDelegateComponents(List<ProbeAttributes> probes,
+                                        List<EffectorAttributes> effectors,
+                                        List<GaugeInstanceDescription> gauges) {
+        logger.info(format("Initializing delegates components. {0} Probes; {1} Effectors; {2} Gauges.", probes.size(), effectors.size(), gauges.size()));
         m_probeManager.initProbes (probes);
-
         m_gaugeManager.initGauges (gauges);
+        m_probeManager.startProbes ();
+
         EffectorDescription ed = new EffectorDescription ();
         ed.effectors = new TreeSet<> (effectors);
         m_effectorManager.initEffectors (ed);
@@ -199,12 +196,13 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
 
     @Override
     protected void log (String txt) {
-        m_masterConnectionPort.info (RainbowComponentT.DELEGATE,
-                MessageFormat.format (
-                        "{2}[{0}]: {1}",
-                        Util.timelog (),
-                        txt,
-                        m_name == null ? MessageFormat.format ("RD-{0}", m_id) : MessageFormat.format ("{0}-{1}", m_name, m_id)));
+        String msg = format (
+                "{2}[{0}]: {1}",
+                Util.timelog (),
+                txt,
+                m_name == null ? format ("RD-{0}", m_id) : format ("{0}-{1}", m_name, m_id));
+        m_masterConnectionPort.info (RainbowComponentT.DELEGATE, msg);
+        logger.info(RainbowComponentT.DELEGATE + " " + msg);
     }
 
     @Override
@@ -231,8 +229,8 @@ public class RainbowDelegate extends AbstractRainbowRunnable implements RainbowC
         }
     }
 
-    /** 
-     * 
+    /**
+     *
      */
     @Override
     protected void doTerminate () {

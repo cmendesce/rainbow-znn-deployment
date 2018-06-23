@@ -55,6 +55,7 @@ public class ZNNCommandFactory extends AcmeModelCommandFactory {
     protected void fillInCommandMap () {
         super.fillInCommandMap ();
         m_commandMap.put ("setResponseTime".toLowerCase (), SetResponseTimeCmd.class);
+        m_commandMap.put ("setExperRespTime".toLowerCase (), SetResponseTimeCmd.class);
         m_commandMap.put ("setLoad".toLowerCase (), SetLoadCmd.class);
         m_commandMap.put ("connectNewServer".toLowerCase (), NewServerCmd.class);
         m_commandMap.put ("deleteServer".toLowerCase (), RemoveServerCmd.class);
